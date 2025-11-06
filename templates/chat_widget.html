@@ -1,0 +1,28 @@
+{# templates/chat_widget.html #}
+
+<div id="chat-widget-container">
+  <button id="chat-icon" onclick="toggleChat()">
+    <i class="fas fa-comment-dots"></i>
+  </button>
+
+  <div class="chat-container hidden" id="chat-box-main">
+    <div class="chat-header">
+      Gemini AI 助手
+      <button class="close-btn" onclick="toggleChat()">&times;</button>
+    </div>
+    <div class="chat-box" id="chat-box">
+      <div class="message ai-message">
+        👋 欢迎！我是您的 AI 助手，请开始提问吧。
+      </div>
+    </div>
+    <div class="input-area">
+      <input
+        type="text"
+        id="user-input"
+        placeholder="输入您的消息..."
+        onkeypress="handleKeyPress(event)"
+      />
+      <button id="send-btn" onclick="sendMessage()">发送</button>
+    </div>
+  </div>
+</div>

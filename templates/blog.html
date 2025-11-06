@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>我的个人技术博客 - 嵌入 AI 助手</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+  </head>
+  <body>
+    <header class="blog-header">
+      <h1>我的技术洞察</h1>
+      <p>探索 Python, Flask 和 AI 技术的融合</p>
+    </header>
+
+    <div class="main-content">
+      <div class="post">
+        <h2>🎉 欢迎来到我的 AI 博客！</h2>
+        <p class="meta">发布于 2025年11月6日</p>
+        <p>
+          本文介绍如何将一个强大的 AI
+          聊天助手嵌入到您的个人博客中。请注意右下角的蓝色图标！点击它可以召唤
+          AI 助手，它能回答您对本文或技术问题的疑问。
+        </p>
+        <p>为了证明页面的可滚动性，下面还有更多占位内容...</p>
+      </div>
+
+      <div class="post">
+        <h2>Python 的未来：异步编程</h2>
+        <p class="meta">发布于 2025年10月15日</p>
+        <p>
+          Python
+          异步编程（Asyncio）是构建高性能网络应用的关键。它允许单个线程处理数千个并发连接，非常适合
+          I/O 密集型任务，如 Web 服务器和数据库查询。了解 `async/await`
+          语法是迈向现代 Python 开发的第一步。
+        </p>
+        <p>... 更多关于异步编程的深入探讨和代码示例。</p>
+      </div>
+
+      <div class="post">
+        <h2>深入理解 LangChain</h2>
+        <p class="meta">发布于 2025年9月1日</p>
+        <p>
+          LangChain 框架旨在帮助开发人员构建由大型语言模型驱动的应用。我们使用的
+          `langchain-google-genai` 模块就是其中的一部分。它简化了与 Gemini
+          模型的交互，包括管理聊天历史、工具调用等等。它的核心概念是链（Chains）和代理（Agents）。
+        </p>
+        <p style="height: 500px"></p>
+      </div>
+    </div>
+
+    {% include 'chat_widget.html' %}
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+  </body>
+</html>
