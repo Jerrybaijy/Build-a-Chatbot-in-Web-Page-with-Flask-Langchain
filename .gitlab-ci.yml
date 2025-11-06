@@ -14,7 +14,7 @@ stages:
 # 环境变量设置
 variables:
   # 请将此变量替换为您在 Docker Hub 上的实际仓库名称
-  DOCKER_REPO_PATH: build-a-chatbot-in-web-page-with-flask-langchain 
+  DOCKER_REPO_PATH: lask-langchain 
 
 build-and-push-image:
   stage: build_and_push
