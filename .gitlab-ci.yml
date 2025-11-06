@@ -1,51 +1,19 @@
-# .gitlab-ci.yml - 修正后的完整版本 (所有 script 命令使用双引号)
-
-# 基础镜像配置
-image: docker:latest
-
-# Docker-in-Docker 服务
-services:
-  - docker:dind
-
-# 定义阶段
-stages:
-  - build_and_push
-
-# 环境变量设置
 variables:
-  # 请将此变量替换为您在 Docker Hub 上的实际仓库名称
-  DOCKER_REPO_PATH: lask-langchain 
+  IMAGE_NAME: jerrybaijy/flask-langchain
+  IMAGE_TAG: v1.0
 
-build-and-push-image:
-  stage: build_and_push
-  
-  # 限制 Job 仅在 'main' 或 'master' 分支推送时运行
-  only:
-    - main
-    - master
-  
+stages:
+  - build
+
+build_image:
+  stage: build
+  image: docker:20.10.20
+  services:
+    - docker:20.10.20-dind
+  variables:
+    DOCKER_TLS_CERTDIR: "/certs"
+  before_script:
+    - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
   script:
-    # 1. 构造镜像名称和标签
-    - "export IMAGE_NAME=$DOCKER_USERNAME/$DOCKER_REPO_PATH"
-    - "export IMAGE_TAG=$CI_COMMIT_SHORT_SHA"
-    
-    # 2. 登录 Docker Hub
-    - "echo \"正在登录 Docker Hub...\""
-    - "docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD"
-    
-    # 3. 构建 Docker 镜像
-    # 修正的行：包含冒号 ":" 和变量 "$IMAGE_NAME:$IMAGE_TAG"
-    - "echo \"正在构建 Docker 镜像: $IMAGE_NAME:$IMAGE_TAG\""
-    - "docker build -t $IMAGE_NAME:$IMAGE_TAG ."
-    
-    # 4. 打上 latest 标签
-    - "docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:latest"
-    
-    # 5. 推送镜像到 Docker Hub
-    - "echo \"正在推送 $IMAGE_TAG 和 latest 标签...\""
-    - "docker push $IMAGE_NAME:$IMAGE_TAG"
-    - "docker push $IMAGE_NAME:latest"
-    
-  # 6. 安全清理: 在 Job 结束时退出登录
-  after_script:
-    - "docker logout"
+    - docker build -t $IMAGE_NAME:$IMAGE_TAG .
+    - docker push $IMAGE_NAME:$IMAGE_TAG
