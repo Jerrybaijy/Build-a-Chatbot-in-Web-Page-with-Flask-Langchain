@@ -1,16 +1,20 @@
-# .gitlab-ci.yml - 修正后的完整版本
+# .gitlab-ci.yml - 修正后的完整版本 (所有 script 命令使用双引号)
 
+# 基础镜像配置
 image: docker:latest
 
+# Docker-in-Docker 服务
 services:
   - docker:dind
 
+# 定义阶段
 stages:
   - build_and_push
 
+# 环境变量设置
 variables:
   # 请将此变量替换为您在 Docker Hub 上的实际仓库名称
-  DOCKER_REPO_PATH: flask-gemini-chat 
+  DOCKER_REPO_PATH: Build-a-Chatbot-in-Web-Page-with-Flask-Langchain 
 
 build-and-push-image:
   stage: build_and_push
@@ -22,26 +26,26 @@ build-and-push-image:
   
   script:
     # 1. 构造镜像名称和标签
-    - export IMAGE_NAME=$DOCKER_USERNAME/$DOCKER_REPO_PATH
-    - export IMAGE_TAG=$CI_COMMIT_SHORT_SHA
+    - "export IMAGE_NAME=$DOCKER_USERNAME/$DOCKER_REPO_PATH"
+    - "export IMAGE_TAG=$CI_COMMIT_SHORT_SHA"
     
-    # 2. 登录 Docker Hub (使用 CI 变量 $DOCKER_USERNAME 和 $DOCKER_PASSWORD)
-    - echo "正在登录 Docker Hub..."
-    # 确保此行是一个字符串命令
-    - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+    # 2. 登录 Docker Hub
+    - "echo \"正在登录 Docker Hub...\""
+    - "docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD"
     
     # 3. 构建 Docker 镜像
-    - echo "正在构建 Docker 镜像: $IMAGE_NAME:$IMAGE_TAG"
-    - docker build -t $IMAGE_NAME:$IMAGE_TAG .
+    # 修正的行：包含冒号 ":" 和变量 "$IMAGE_NAME:$IMAGE_TAG"
+    - "echo \"正在构建 Docker 镜像: $IMAGE_NAME:$IMAGE_TAG\""
+    - "docker build -t $IMAGE_NAME:$IMAGE_TAG ."
     
     # 4. 打上 latest 标签
-    - docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:latest
+    - "docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:latest"
     
     # 5. 推送镜像到 Docker Hub
-    - echo "正在推送 $IMAGE_TAG 和 latest 标签..."
-    - docker push $IMAGE_NAME:$IMAGE_TAG
-    - docker push $IMAGE_NAME:latest
+    - "echo \"正在推送 $IMAGE_TAG 和 latest 标签...\""
+    - "docker push $IMAGE_NAME:$IMAGE_TAG"
+    - "docker push $IMAGE_NAME:latest"
     
   # 6. 安全清理: 在 Job 结束时退出登录
   after_script:
-    - docker logout
+    - "docker logout"
