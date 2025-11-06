@@ -1,0 +1,19 @@
+variables:
+  IMAGE_NAME: jerrybaijy/Build-a-Chatbot-in-Web-Page-with-Flask-Langchain
+  IMAGE_TAG: v1.0
+
+stages:
+  - build
+
+build_image:
+  stage: build
+  image: docker:20.10.20
+  services:
+    - docker:20.10.20-dind
+  variables:
+    DOCKER_TLS_CERTDIR: "/certs"
+  before_script:
+    - docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+  script:
+    - docker build -t $IMAGE_NAME:$IMAGE_TAG .
+    - docker push $IMAGE_NAME:$IMAGE_TAG
