@@ -1,19 +1,62 @@
-variables:
-  IMAGE_NAME: jerrybaijy/Build-a-Chatbot-in-Web-Page-with-Flask-Langchain
-  IMAGE_TAG: v1.0
+# .gitlab-ci.yml - 改进版本
 
+# 定义使用的 Docker 镜像。
+# 我们使用最新的 docker:latest 作为 executor，并以 docker:dind 作为服务。
+image: docker:latest
+
+# 定义 Docker-in-Docker 服务，用于在 Job 中运行 docker 命令
+services:
+  - docker:dind
+
+# 定义阶段
 stages:
-  - build
+  - build_and_push
 
-build_image:
-  stage: build
-  image: docker:20.10.20
-  services:
-    - docker:20.10.20-dind
-  variables:
-    DOCKER_TLS_CERTDIR: "/certs"
-  before_script:
-    - docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+# ----------------------------------------------------------------------
+# 环境变量设置
+# ----------------------------------------------------------------------
+
+variables:
+  # 推荐只在 GitLab CI 变量中存储 DOCKER_HUB_USERNAME，
+  # 并在 Job 中构造完整的 IMAGE_NAME
+  DOCKER_REPO_PATH: Build-a-Chatbot-in-Web-Page-with-Flask-Langchain
+
+# ----------------------------------------------------------------------
+# Docker 构建与推送任务
+# ----------------------------------------------------------------------
+
+build-and-push-image:
+  stage: build_and_push
+  
+  # 限制 Job 仅在 'main' 或 'master' 分支推送时运行
+  only:
+    - main
+    - master
+  
   script:
+    # 1. 构造镜像名称和标签
+    # 假设你在 GitLab CI/CD 变量中设置了 $DOCKER_USERNAME
+    # 使用 CI 提供的短 SHA 作为动态标签
+    - export IMAGE_NAME=$DOCKER_USERNAME/$DOCKER_REPO_PATH
+    - export IMAGE_TAG=$CI_COMMIT_SHORT_SHA
+    
+    # 2. 登录 Docker Hub (请确保在 GitLab 变量中设置了 $DOCKER_USERNAME 和 $DOCKER_PASSWORD)
+    # ⚠️ 变量名统一为 DOCKER_USERNAME 和 DOCKER_PASSWORD
+    - echo "正在登录 Docker Hub..."
+    - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+    
+    # 3. 构建 Docker 镜像
+    - echo "正在构建 Docker 镜像: $IMAGE_NAME:$IMAGE_TAG"
     - docker build -t $IMAGE_NAME:$IMAGE_TAG .
+    
+    # 4. 打上 latest 标签
+    - docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:latest
+    
+    # 5. 推送镜像到 Docker Hub
+    - echo "正在推送 $IMAGE_TAG 和 latest 标签..."
     - docker push $IMAGE_NAME:$IMAGE_TAG
+    - docker push $IMAGE_NAME:latest
+    
+  # 6. 安全清理: 在 Job 结束时退出登录
+  after_script:
+    - docker logout
